@@ -10,7 +10,7 @@
 #----------------------------------------------------------------------
 
 package require Tk 8.4
-package provide textSearch 0.3
+package provide textSearch 0.4
 
 namespace eval textSearch {
     namespace export enableSearch searchMenu
@@ -48,7 +48,7 @@ proc textSearch::enableSearch {w args} {
     set opts(isearch) 1
     set opts(search)  1
     set opts(label) ""
-    
+
     set value ""
     foreach arg $args {
         if {$value != ""} {
@@ -81,7 +81,7 @@ proc textSearch::enableSearch {w args} {
             $w tag configure _textSearchSel $opt $val
         }
     }
-    
+
     bind textSearchIS <Control-Key-s> "textSearch::startIncrementalSearch %W"
     if {$opts(isearch)} {
         bindtags $w "textSearchIS [bindtags $w]"
@@ -353,6 +353,7 @@ proc textSearch::FindDialog {} {
         label $top.f.l -text "Find text:" -anchor w -underline 5
         bind $top <Alt-Key-t> [list focus $top.f.entry]
         entry $top.f.entry -textvariable ::textSearch::searchString -width 30
+        $top.f.entry selection range 0 end
         pack $top.f.l -side left -ipadx 10
         pack $top.f.entry -side right -fill x -expand 1
 
@@ -364,12 +365,14 @@ proc textSearch::FindDialog {} {
                 -underline 0 \
                 -variable ::textSearch::searchCase
         bind $top <Alt-Key-m> [list $top.case invoke]
-    
+
         button $top.next   -text "Find next" -width 10 -default active \
                 -command ::textSearch::searchNext
         button $top.cancel -text Cancel -width 10 -default normal \
                 -command [list ::textSearch::DismissDialog $top]
-    
+        wm protocol $top WM_DELETE_WINDOW \
+                [list ::textSearch::DismissDialog $top]
+
         grid $top.f     - $top.next    -sticky we -padx 4 -pady 4
         grid $top.whole x $top.cancel  -sticky w  -padx 4 -pady 4
         grid $top.case  x ^            -sticky w  -padx 4 -pady 4
@@ -378,7 +381,7 @@ proc textSearch::FindDialog {} {
         grid columnconfigure $top 1 -weight 1
         grid columnconfigure $top 1 -minsize 10 -weight 2
         grid rowconfigure $top 3 -weight 1
-    
+
         bind $top.f.entry <Key-Return> \
                 "[list $top.next invoke] ; break"
         bind $top.f.entry <Key-Escape> \
@@ -458,6 +461,7 @@ proc textSearch::searchNext {{backwards 0}} {
     $searchWin tag add sel $searchPos "$searchPos + $cnt chars"
     if {[focus -displayof $searchWin] != $searchWin} {
         $searchWin tag add _textSearchSel $searchPos "$searchPos + $cnt chars"
+        $searchWin tag raise _textSearchSel
     }
     set searchIndex $searchPos
 }

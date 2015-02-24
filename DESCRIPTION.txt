@@ -1,7 +1,7 @@
 Identifier: textSearch
-Version: 0.2.1
+Version: 0.4
 Title: Search commands for text widget
-Creator: Peter Spjuth <peter.spjuth at space dot se>
+Creator: Peter Spjuth <peter.spjuth at gmail dot com>
 Rights: BSD
 Available: 2003-08-05
 Description: Provides procedures to add search and incremental
